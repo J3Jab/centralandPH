@@ -17,7 +17,7 @@ export default async function handler(
     `${jsonDirectory}/all.json`,
     "utf-8"
   );
-
+  
   product_data = JSON.parse(product_data);
   product_data =  product_data.map(value => ({ value, sort: Math.random() })).sort((a, b) => a.sort - b.sort).map(({ value }) => value)
   product_data = product_data.slice(0, 8);
