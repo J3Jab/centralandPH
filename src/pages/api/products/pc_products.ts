@@ -1,7 +1,8 @@
 import path from "path";
 import { promises as fs } from "fs";
 import { NextApiRequest, NextApiResponse } from "next";
-import { PRODUCT_DATA_LENGTH } from "./helpers/constants";
+import { PRODUCT_DATA_LENGTH} from "./helpers/constants";
+import * as filterHelper from "./helpers/filterHelper";
 
 /**
  * Retrieve PC products
@@ -10,8 +11,15 @@ import { PRODUCT_DATA_LENGTH } from "./helpers/constants";
  */
 
 interface RequestQuery {
-  source?: string;
-  condition?: string;
+  facebook?: string;
+  shopee?: string;
+  datablitz?: string;
+  carousell?: string;
+  lazada?: string;
+  bNew?: string;
+  lNew?: string;
+  sUsed?: string;
+  wUsed?: string;
   minPrice?: string;
   maxPrice?: string;
   page?: number;
@@ -23,43 +31,34 @@ export default async function handler(
 ) {
   const jsonDirectory = path.join(process.cwd(), "/json");
 
+  // Load static data from file system
   const data = await fs.readFile(`${jsonDirectory}/all.json`, "utf-8");
   const allProducts = JSON.parse(data);
 
   // Obtain query params, if any
-  const { source, condition, minPrice, maxPrice, page }: RequestQuery =
-    req.query;
-  const pageNumber = page ?? 0;
+  const query = req.query;
+  const pageNumber = parseInt(query.page as string) || 0;
+
   // Filter by PC Parts
   var pcProducts = allProducts.filter(
     (product: any) => product.product_type === "pc"
   );
 
-  // // Other filters, in request (if any)
-  // pcProducts = pcProducts.filter((product: any) => {
-  //   if (source && source !== "" && source !== product.source)
-  //     return false;
-
-  //   if (condition && condition !== "" && condition !== product.condition)
-  //     return false;
-
-  //   // If max price == 0, then no price range given
-  //   if (maxPrice && parseInt(maxPrice) !== 0) {
-  //     // Exclude if not in range
-  //     if (minPrice && product.price < parseInt(minPrice))
-  //       return false;
-
-  //     if (maxPrice > product.price)
-  //       return false;
-  //   }
-  //   return true;
-  // })
+  // Filter by query parameters -- if any (search, website, price, condition)
+  var filteredProducts = filterHelper.filterProducts(req, pcProducts);
 
   // Page
-  pcProducts = pcProducts.slice(
+  var pageProducts = filteredProducts.slice(
     pageNumber * PRODUCT_DATA_LENGTH,
     PRODUCT_DATA_LENGTH * pageNumber + PRODUCT_DATA_LENGTH
   );
 
-  res.status(200).json(pcProducts);
+  const currentIndex = PRODUCT_DATA_LENGTH * pageNumber + PRODUCT_DATA_LENGTH;
+  // console.log(`Current Index: ${currentIndex} | filteredProds Length: ${filteredProducts.length}`)
+  const result = {
+    pageProducts, 
+    hasMore: currentIndex <= filteredProducts.length
+  };
+
+  res.status(200).json(result);
 }

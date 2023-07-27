@@ -13,15 +13,7 @@ import {
 import "./sidebar.scss";
 import { useForm } from "@mantine/form";
 import { useRouter } from "next/router";
-
-export enum Websites {
-  Facebook,
-  Shopee,
-  Carousell,
-  Lazada,
-  TipidPC,
-  Gilmore,
-}
+import qs from "qs";
 
 const Sidebar = (props: any) => {
   const form = useForm({
@@ -42,19 +34,7 @@ const Sidebar = (props: any) => {
   const router = useRouter();
 
   const submitForm = (values: any) => {
-    console.log(values.facebook);
-    router.query.facebook = values.facebook;
-    router.query.shopee = values.shopee;
-    router.query.datablitz = values.datablitz;
-    router.query.carousell = values.carousell;
-    router.query.lazada = values.lazada;
-    router.query.bNew = values.bNew;
-    router.query.lNew = values.lNew;
-    router.query.sUsed = values.sUsed;
-    router.query.wUsed = values.wUsed;
-    router.query.min = values.min;
-    router.query.max = values.max;
-    router.push(router);
+    router.push(`?${qs.stringify(form.values)}`);
   };
 
   React.useEffect(() => {
