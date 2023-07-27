@@ -11,8 +11,9 @@ import Link from 'next/link';
 
 export default function IndexPage() {
 	const [isLoading, setLoading] = useState(false);
+	const [numToShow, setNumToShow] = useState(8);
 	const [hotItems, setHotItems] = useState([]);
-  const [newItems, setNewItems] = useState([])
+	const [newItems, setNewItems] = useState([]);
 	const [whatsHotChips, setWhatsHotChips] = useState([
 		{ label: 'Games', isActive: false },
 		{ label: 'Consoles', isActive: false },
@@ -26,6 +27,27 @@ export default function IndexPage() {
 		{ label: 'Peripherals', isActive: false },
 	]);
 
+  const getFilter = (chipObject) => {
+    let filter = ''
+    try {
+      console.log(chipObject.label)
+    
+      if (chipObject.label === 'Games') {
+        filter = '?filter=games';
+      } else if (chipObject.label === 'Consoles') {
+        filter = '?filter=consoles';
+      } else if (chipObject.label === 'PC Parts') {
+        filter = '?filter=pc';
+      } else if (chipObject.label === 'Peripherals') {
+        filter = '?filter=peripherals';
+      }
+    } catch (e) {
+      console.log('no filters selected')
+    } finally {
+      return filter
+    }
+  }
+
 	const handleSetActive = (label: String, setname: String) => {
 		switch (setname) {
 			case 'whatsHot':
@@ -33,9 +55,17 @@ export default function IndexPage() {
 					let returnChip = { ...chip };
 					if (chip.label === label) returnChip.isActive = !chip.isActive;
 					else returnChip.isActive = false;
-					return returnChip;
+          return returnChip
 				});
 				setWhatsHotChips(newWhatsHotChips);
+        const hotChipsSelected = newWhatsHotChips.filter(chip => chip.isActive);
+        const hotFilter = (getFilter(hotChipsSelected[0]))
+        fetch(`/api/products/whats_hot${hotFilter}`)
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+          setHotItems(data);
+        });
 				break;
 			case 'newlyListed':
 				let newNewlyListedChips = newlyListedChips.map((chip) => {
@@ -45,6 +75,14 @@ export default function IndexPage() {
 					return returnChip;
 				});
 				setNewlyListedChips(newNewlyListedChips);
+        const newChipsSelected = newNewlyListedChips.filter(chip => chip.isActive);
+        const newFilter = (getFilter(newChipsSelected[0]))
+        fetch(`/api/products/newly_listed${newFilter}`)
+        .then((res) => res.json())
+        .then((data) => {
+          // console.log(data);
+          setNewItems(data);
+        });
 				break;
 			default:
 				break;
@@ -54,23 +92,43 @@ export default function IndexPage() {
 	// Update hotItems whenever data changes
 	useEffect(() => {
 		setLoading(true);
-		fetch('/api/products/whats_hot')
+		fetch(`/api/products/whats_hot`)
 			.then((res) => res.json())
 			.then((data) => {
-				console.log(data);
+				// console.log(data);
 				setHotItems(data);
 				setLoading(false);
-				// console.log(hotItems);
 			});
-      setLoading(true);
-      fetch('/api/products/newly_listed')
+		setLoading(true);
+		fetch(`/api/products/newly_listed`)
 			.then((res) => res.json())
 			.then((data) => {
-				console.log(data);
+				// console.log(data);
 				setNewItems(data);
 				setLoading(false);
-				// console.log(hotItems);
 			});
+	}, []);
+
+	useEffect(() => {
+		const xsWindow = window.matchMedia('(min-width: 900px)');
+		const smWindow = window.matchMedia('(min-width: 1200px)');
+		const mdWindow = window.matchMedia('(min-width: 1440px)');
+		const lgWindow = window.matchMedia('(min-width: 1800px)');
+		const xlWindow = window.matchMedia('(min-width: 2560px)');
+
+		smWindow.addEventListener('change', () => setNumToShow(8));
+		smWindow.addEventListener('change', () => setNumToShow(9));
+		mdWindow.addEventListener('change', () => setNumToShow(8));
+		lgWindow.addEventListener('change', () => setNumToShow(12));
+		xlWindow.addEventListener('change', () => setNumToShow(16));
+
+		return () => {
+			smWindow.removeEventListener('change', () => setNumToShow(8));
+			smWindow.removeEventListener('change', () => setNumToShow(9));
+			mdWindow.removeEventListener('change', () => setNumToShow(8));
+			lgWindow.removeEventListener('change', () => setNumToShow(12));
+			xlWindow.removeEventListener('change', () => setNumToShow(16));
+		};
 	}, []);
 
 	return (
@@ -128,20 +186,21 @@ export default function IndexPage() {
 						// cols={6}
 						// spacing='xs'
 						verticalSpacing='xl'
-            breakpoints={[
-              // { maxWidth: 'md', cols: 4, spacing: 'xs' },
-              // { maxWidth: 'sm', cols: 2, spacing: 'xs' },
-              { minWidth: 2560, cols: 8, spacing: 'xs' },
-              { minWidth: 1440, cols: 6, spacing: 'xs' },
-              { minWidth: 1200, cols: 4, spacing: 'xs' },
-              { minWidth: 1080, cols: 3, spacing: 'xs' },
-            ]}
+						breakpoints={[
+							// { maxWidth: 'md', cols: 4, spacing: 'xs' },
+							// { maxWidth: 'sm', cols: 2, spacing: 'xs' },
+							{ minWidth: 2560, cols: 8, spacing: 'xs' },
+							{ minWidth: 1800, cols: 6, spacing: 'xs' },
+							{ minWidth: 1440, cols: 4, spacing: 'xs' },
+							{ minWidth: 1080, cols: 3, spacing: 'xs' },
+							{ minWidth: 900, cols: 2, spacing: 'xs' },
+						]}
 						sx={{
 							placeItems: 'center',
 							alignItems: 'center',
 						}}
 					>
-						{hotItems.map((item: ProductProps, index) => (
+						{hotItems.slice(0, numToShow).map((item: ProductProps, index) => (
 							<ProductItem key={index} {...item} />
 						))}
 					</SimpleGrid>
@@ -178,20 +237,21 @@ export default function IndexPage() {
 
 					<SimpleGrid
 						verticalSpacing='xl'
-            breakpoints={[
-              // { maxWidth: 'md', cols: 4, spacing: 'xs' },
-              // { maxWidth: 'sm', cols: 2, spacing: 'xs' },
-              { minWidth: 2560, cols: 8, spacing: 'md' },
-              { minWidth: 1440, cols: 6, spacing: 'md' },
-              { minWidth: 1200, cols: 4, spacing: 'md' },
-              { minWidth: 1080, cols: 3, spacing: 'md' },
-            ]}
+						breakpoints={[
+							// { maxWidth: 'md', cols: 4, spacing: 'xs' },
+							// { maxWidth: 'sm', cols: 2, spacing: 'xs' },
+							{ minWidth: 2560, cols: 8, spacing: 'xs' },
+							{ minWidth: 1800, cols: 6, spacing: 'xs' },
+							{ minWidth: 1440, cols: 4, spacing: 'xs' },
+							{ minWidth: 1080, cols: 3, spacing: 'xs' },
+              { minWidth: 900, cols: 2, spacing: 'xs' },
+						]}
 						sx={{
 							placeItems: 'center',
 							alignItems: 'center',
 						}}
 					>
-						{newItems.map((item: ProductProps, index) => (
+						{newItems.slice(0, numToShow).map((item: ProductProps, index) => (
 							<ProductItem key={index} {...item} />
 						))}
 					</SimpleGrid>
