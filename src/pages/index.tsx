@@ -27,26 +27,26 @@ export default function IndexPage() {
 		{ label: 'Peripherals', isActive: false },
 	]);
 
-  const getFilter = (chipObject : any) => {
-    let filter = ''
-    try {
-      console.log(chipObject.label)
-    
-      if (chipObject.label === 'Games') {
-        filter = '?filter=games';
-      } else if (chipObject.label === 'Consoles') {
-        filter = '?filter=consoles';
-      } else if (chipObject.label === 'PC Parts') {
-        filter = '?filter=pc';
-      } else if (chipObject.label === 'Peripherals') {
-        filter = '?filter=peripherals';
-      }
-    } catch (e) {
-      console.log('no filters selected')
-    } finally {
-      return filter
-    }
-  }
+	const getFilter = (chipObject) => {
+		let filter = '';
+		try {
+			console.log(chipObject.label);
+
+			if (chipObject.label === 'Games') {
+				filter = '?filter=games';
+			} else if (chipObject.label === 'Consoles') {
+				filter = '?filter=consoles';
+			} else if (chipObject.label === 'PC Parts') {
+				filter = '?filter=pc';
+			} else if (chipObject.label === 'Peripherals') {
+				filter = '?filter=peripherals';
+			}
+		} catch (e) {
+			console.log('no filters selected');
+		} finally {
+			return filter;
+		}
+	};
 
 	const handleSetActive = (label: String, setname: String) => {
 		switch (setname) {
@@ -55,17 +55,19 @@ export default function IndexPage() {
 					let returnChip = { ...chip };
 					if (chip.label === label) returnChip.isActive = !chip.isActive;
 					else returnChip.isActive = false;
-          return returnChip
+					return returnChip;
 				});
 				setWhatsHotChips(newWhatsHotChips);
-        const hotChipsSelected = newWhatsHotChips.filter(chip => chip.isActive);
-        const hotFilter = (getFilter(hotChipsSelected[0]))
-        fetch(`/api/products/whats_hot${hotFilter}`)
-        .then((res) => res.json())
-        .then((data) => {
-          console.log(data);
-          setHotItems(data);
-        });
+				const hotChipsSelected = newWhatsHotChips.filter(
+					(chip) => chip.isActive
+				);
+				const hotFilter = getFilter(hotChipsSelected[0]);
+				fetch(`/api/products/whats_hot${hotFilter}`)
+					.then((res) => res.json())
+					.then((data) => {
+						console.log(data);
+						setHotItems(data);
+					});
 				break;
 			case 'newlyListed':
 				let newNewlyListedChips = newlyListedChips.map((chip) => {
@@ -75,14 +77,16 @@ export default function IndexPage() {
 					return returnChip;
 				});
 				setNewlyListedChips(newNewlyListedChips);
-        const newChipsSelected = newNewlyListedChips.filter(chip => chip.isActive);
-        const newFilter = (getFilter(newChipsSelected[0]))
-        fetch(`/api/products/newly_listed${newFilter}`)
-        .then((res) => res.json())
-        .then((data) => {
-          // console.log(data);
-          setNewItems(data);
-        });
+				const newChipsSelected = newNewlyListedChips.filter(
+					(chip) => chip.isActive
+				);
+				const newFilter = getFilter(newChipsSelected[0]);
+				fetch(`/api/products/newly_listed${newFilter}`)
+					.then((res) => res.json())
+					.then((data) => {
+						// console.log(data);
+						setNewItems(data);
+					});
 				break;
 			default:
 				break;
@@ -244,7 +248,7 @@ export default function IndexPage() {
 							{ minWidth: 1800, cols: 6, spacing: 'xs' },
 							{ minWidth: 1440, cols: 4, spacing: 'xs' },
 							{ minWidth: 1080, cols: 3, spacing: 'xs' },
-              { minWidth: 900, cols: 2, spacing: 'xs' },
+							{ minWidth: 900, cols: 2, spacing: 'xs' },
 						]}
 						sx={{
 							placeItems: 'center',

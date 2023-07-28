@@ -1,6 +1,6 @@
-import path from "path";
-import { promises as fs } from "fs";
-import { NextApiRequest, NextApiResponse } from "next";
+import path from 'path';
+import { promises as fs } from 'fs';
+import { NextApiRequest, NextApiResponse } from 'next';
 
 /**
  * Obtain ALL COMPUTER PARTS from carousell
@@ -8,19 +8,27 @@ import { NextApiRequest, NextApiResponse } from "next";
  * @param res
  */
 export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
+	req: NextApiRequest,
+	res: NextApiResponse
 ) {
-  const query = req.query
-  const jsonDirectory = path.join(process.cwd(), "/json");
+	const query = req.query;
+	const jsonDirectory = path.join(process.cwd(), '/json');
 
-  const data = await fs.readFile(
-    `${jsonDirectory}/all.json`,
-    "utf-8"
-  );
+	var product_data = await fs.readFile(`${jsonDirectory}/all.json`, 'utf-8');
 
-  var allProducts = JSON.parse(data);
-  allProducts =  allProducts.map((value : any) => ({ value, sort: Math.random() })).sort((a: { sort: number; }, b: { sort: number; }) => a.sort - b.sort).map(({ value } : any) => value)
-  allProducts = allProducts.slice(0, 8);
-  res.status(200).json(allProducts);
+	product_data = JSON.parse(product_data);
+	product_data = product_data
+		.map((value) => ({ value, sort: Math.random() }))
+		.sort((a, b) => a.sort - b.sort)
+		.map(({ value }) => value);
+	product_data = product_data.filter(
+		(product) => product.source !== 'Facebook'
+	);
+	if (Object.keys(query).length !== 0) {
+		product_data = product_data.filter(
+			(product) => product.product_type === `${query.filter}`
+		);
+	}
+	product_data = product_data.slice(0, 16);
+	res.status(200).json(product_data);
 }
