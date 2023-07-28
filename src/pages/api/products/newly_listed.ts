@@ -14,21 +14,19 @@ export default async function handler(
 	const query = req.query;
 	const jsonDirectory = path.join(process.cwd(), '/json');
 
-	var product_data = await fs.readFile(`${jsonDirectory}/all.json`, 'utf-8');
+	const data = await fs.readFile(`${jsonDirectory}/all.json`, 'utf-8');
 
-	product_data = JSON.parse(product_data);
-	product_data = product_data
-		.map((value) => ({ value, sort: Math.random() }))
-		.sort((a, b) => a.sort - b.sort)
-		.map(({ value }) => value);
-	product_data = product_data.filter(
-		(product) => product.source !== 'Facebook'
-	);
+	let products = JSON.parse(data);
+	products = products
+		.map((value: any) => ({ value, sort: Math.random() }))
+		.sort((a: { sort: number }, b: { sort: number }) => a.sort - b.sort)
+		.map(({ value }: any) => value);
+	products = products.filter((product: any) => product.source !== 'Facebook');
 	if (Object.keys(query).length !== 0) {
-		product_data = product_data.filter(
-			(product) => product.product_type === `${query.filter}`
+		products = products.filter(
+			(product: any) => product.product_type === `${query.filter}`
 		);
 	}
-	product_data = product_data.slice(0, 16);
-	res.status(200).json(product_data);
+	products = products.slice(0, 16);
+	res.status(200).json(products);
 }

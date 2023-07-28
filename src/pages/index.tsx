@@ -27,7 +27,7 @@ export default function IndexPage() {
 		{ label: 'Peripherals', isActive: false },
 	]);
 
-	const getFilter = (chipObject) => {
+	const getFilter = (chipObject: any) => {
 		let filter = '';
 		try {
 			console.log(chipObject.label);
