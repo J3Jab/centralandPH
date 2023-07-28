@@ -6,10 +6,7 @@ import React, { useEffect, useState } from 'react';
 import LoginModal from '@/components/LoginModal';
 import { useDisclosure } from '@mantine/hooks';
 import SignUpModal from './SignUpModal';
-import { IconSearch } from '@tabler/icons';
 import SearchIcon from './Icons/SearchIcon';
-import { useRouter } from 'next/router';
-import { UseFormReturnType } from "@mantine/form";
 
 const WebsiteNavbar = ({ form, submitForm }: any ) => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -117,7 +114,7 @@ const WebsiteNavbar = ({ form, submitForm }: any ) => {
 						</Text>
 					</Link>
 
-					<div style={{ position: 'relative' }}>
+					{/* <div style={{ position: 'relative' }}>
 						<Image
 							width={40}
 							height={40}
@@ -143,7 +140,7 @@ const WebsiteNavbar = ({ form, submitForm }: any ) => {
 								</li>
 							</ul>
 						)}
-					</div>
+					</div> */}
 				</Group>
 			</Group>
 		</Header>
