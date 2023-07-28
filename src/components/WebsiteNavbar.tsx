@@ -9,11 +9,11 @@ import SignUpModal from './SignUpModal';
 import { IconSearch } from '@tabler/icons';
 import SearchIcon from './Icons/SearchIcon';
 import { useRouter } from 'next/router';
+import { UseFormReturnType } from "@mantine/form";
 
-const WebsiteNavbar = () => {
+const WebsiteNavbar = ({ form, submitForm }: any ) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-	const [search, setSearch] = useState('');
 
 	const [opened, { open, close }] = useDisclosure(false);
 	const [signUpOpen, handlers] = useDisclosure(false);
@@ -29,14 +29,7 @@ const WebsiteNavbar = () => {
 	const closeLoginModal = () => {
 		setIsLoginModalOpen(false);
 	};
-
-	const router = useRouter();
-
-	const handleSearch = () => {
-		router.query.search = search;
-		router.push(router);
-	};
-
+	
 	return (
 		<Header
 			height={70}
@@ -45,6 +38,7 @@ const WebsiteNavbar = () => {
 				//borderColor: "black",
 				boxShadow: '0px 0px 8px 0px #00000040;',
 			}}
+			className="z-50"
 		>
 			<SignUpModal
 				opened={signUpOpen}
@@ -71,12 +65,6 @@ const WebsiteNavbar = () => {
 							alt='CentralandPH Logo'
 						/>
 					</Link>
-
-					{/* <Link href="/">
-            <Text weight={700} size={24} color="black">
-              CentralandPH
-            </Text>
-          </Link> */}
 				</Group>
 				<Flex
 					style={{
@@ -92,11 +80,11 @@ const WebsiteNavbar = () => {
 							flexGrow: 1,
 						}}
 						style={{}}
-						value={search}
-						onChange={(event) => setSearch(event.currentTarget.value)}
+						{...form.getInputProps('search')}
+						// onChange={(event) => form.setFieldValue("search", event.currentTarget.value)}
 						onKeyUp={(event) => {
 							if (event.key === 'Enter') {
-								handleSearch();
+								submitForm();
 							}
 						}}
 					/>

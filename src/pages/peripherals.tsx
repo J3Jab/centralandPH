@@ -1,196 +1,61 @@
 import Head from "next/head";
-import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import React, { useState, useEffect } from "react";
 import ProductItem, {
   ProductProps,
-} from "@/components/ProductItem/ProductItem";
+} from "../components/ProductItem/ProductItem";
 import { Box, SimpleGrid, TextInput } from "@mantine/core";
-import SearchIcon from "../components/Icons/SearchIcon";
-import { useRouter } from "next/router";
+import InfiniteScroll from "react-infinite-scroll-component";
+import qs from "qs";
 
-export default function PeripheralsPage() {
-  const [items, setItems] = useState([]);
+export default function PeripheralPage(props: any) {
+  const [items, setItems] = useState<ProductProps[]>([]);
   const [isLoading, setLoading] = useState(true);
   const router = useRouter();
-  const searchParam = router.query.search ? router.query.search : "";
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
 
-  const {
-    facebook,
-    shopee,
-    datablitz,
-    carousell,
-    bNew,
-    lNew,
-    sUsed,
-    wUsed,
-    min,
-    max,
-    lazada,
-  } = router.query;
-
-  const website = {
-    facebook: facebook || "false",
-    shopee: shopee || "false",
-    datablitz: datablitz || "false",
-    carousell: carousell || "false",
-    lazada: lazada || "false",
-  };
-
-  const condition = {
-    bNew: bNew || "false",
-    lNew: lNew || "false",
-    sUsed: sUsed || "false",
-    wUsed: wUsed || "false",
-  };
-
-  const price = {
-    min: min || "",
-    max: max || "",
-  };
-
-  useEffect(() => {
-    setLoading(true);
-    fetch("/api/products/peripherals_products")
+  // Used for infinite scrolling
+  const fetchDataScroll = () => {
+    const nextPage = page + 1;
+    // Stringify filters from router query
+    const queryString = qs.stringify(router.query);
+    fetch(
+      `/api/products/peripherals_products?page=${nextPage}&${queryString}`
+    )
       .then((res) => res.json())
       .then((data) => {
-        setItems(data);
+        setHasMore(data.hasMore);
+        setItems((prevItems) => [...prevItems, ...data.pageProducts]);
+        setPage(nextPage);
+      });
+  };
+
+  // Filter changes, reset data
+  useEffect(() => {
+    if (!router.isReady) return;
+    setLoading(true);
+    setItems([]);
+    setPage(0);
+    const queryString = qs.stringify(router.query);
+    fetch(
+      `/api/products/peripherals_products?${queryString}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setHasMore(data.hasMore);
+        setItems(data.pageProducts);
         setLoading(false);
       });
-  }, []);
+  }, [router.query, router.isReady]);
 
-  const filteredProducts = React.useMemo(() => {
-    const filtered =
-      items.filter((product: ProductProps) =>
-        product.product_name
-          .toLowerCase()
-          .includes((searchParam as string).toLowerCase())
-      ) ?? [];
-
-    return filtered;
-  }, [items, searchParam]);
-
-  const filteredWebsite = React.useMemo(() => {
-    if (
-      website.facebook == "false" &&
-      website.shopee == "false" &&
-      website.carousell == "false" &&
-      website.datablitz == "false" &&
-      website.lazada == "false"
-    ) {
-      return filteredProducts;
-    }
-
-    const filtered = filteredProducts.filter((product: ProductProps) => {
-      if (
-        website.facebook == "true" &&
-        product.source.toLowerCase() === "facebook"
-      ) {
-        return true;
-      }
-      if (
-        website.shopee == "true" &&
-        product.source.toLowerCase() === "shopee"
-      ) {
-        return true;
-      }
-      if (
-        website.datablitz == "true" &&
-        product.source.toLowerCase() === "datablitz"
-      ) {
-        return true;
-      }
-      if (
-        website.carousell == "true" &&
-        product.source.toLowerCase() === "carousell"
-      ) {
-        return true;
-      }
-      if (
-        website.lazada == "true" &&
-        product.source.toLowerCase() === "lazada"
-      ) {
-        return true;
-      }
-      return false;
-    });
-    return filtered;
-  }, [website, filteredProducts]);
-
-  const filteredCondition = React.useMemo(() => {
-    if (
-      condition.bNew == "false" &&
-      condition.lNew == "false" &&
-      condition.sUsed == "false" &&
-      condition.wUsed == "false"
-    ) {
-      return filteredWebsite;
-    }
-
-    const filtered = filteredWebsite.filter((product: ProductProps) => {
-      if (
-        condition.bNew == "true" &&
-        product.product_condition?.toLowerCase() === "brand new"
-      ) {
-        return true;
-      }
-      if (
-        condition.lNew == "true" &&
-        product.product_condition?.toLowerCase() === "like new"
-      ) {
-        return true;
-      }
-      if (
-        condition.sUsed == "true" &&
-        product.product_condition?.toLowerCase() === "slightly used"
-      ) {
-        return true;
-      }
-      if (
-        condition.wUsed == "true" &&
-        product.product_condition?.toLowerCase() === "well used"
-      ) {
-        return true;
-      }
-      return false;
-    });
-    return filtered;
-  }, [condition, filteredWebsite]);
-
-  const filteredPrice = React.useMemo(() => {
-    if (price.min == "" && price.max == "") {
-      return filteredCondition;
-    }
-
-    const filtered = filteredCondition.filter((product: ProductProps) => {
-      if (
-        price.min === "" &&
-        price.max !== "" &&
-        product.product_price &&
-        parseFloat(product.product_price) <= parseFloat(price.max as string)
-      ) {
-        return true;
-      }
-      if (
-        price.min !== "" &&
-        price.max === "" &&
-        product.product_price &&
-        parseFloat(product.product_price) >= parseFloat(price.min as string)
-      ) {
-        return true;
-      }
-      if (
-        price.min !== "" &&
-        price.max !== "" &&
-        product.product_price &&
-        parseFloat(product.product_price) >= parseFloat(price.min as string) &&
-        parseFloat(product.product_price) <= parseFloat(price.max as string)
-      ) {
-        return true;
-      }
-      return false;
-    });
-    return filtered;
-  }, [price, filteredCondition]);
-
+  const endMessage = (
+    <h2 className="flex justify-center text-center text-lg">{items.length > 0 ? 
+      "No more products to show" : 
+      (<>No products found. {<br/>} Try removing filters or search for different keywords.</>)}
+    </h2>
+  )
+  
   return (
     <Box
       w="75%"
@@ -198,54 +63,49 @@ export default function PeripheralsPage() {
         left: "220px",
         position: "absolute",
       }}
+      className="mx-20 py-8"
+      id="scroll-container"
     >
       <Head>
         <title>Peripherals</title>
       </Head>
-      {/* <section className='py-10'>
-				<form action='/peripherals'>
-					<div className='flex justify-center'>
-						<TextInput
-							placeholder='Search'
-							radius={10}
-							value={searchVal}
-							className='w-1/2'
-							onChange={(event) => {
-								setSearchVal(event.currentTarget.value);
-							}}
-							icon={<SearchIcon size={14} />}
-						/>
-					</div>
-				</form>
-			</section> */}
 
       <div className="pb-8">
         <p className="font-semibold text-2xl">Peripherals</p>
         <p className="text-sm">
-          Find new and used peripherals for your gaming needs for sale in the
+        Find new and used peripherals for your gaming needs for sale in the
           Philippines.
         </p>
       </div>
-
-      <SimpleGrid
-        cols={5}
-        spacing="lg"
-        verticalSpacing="xl"
-        sx={{
-          placeItems: "start",
-          alignItems: "start",
-        }}
-        breakpoints={[
-          { maxWidth: "120rem", cols: 4, spacing: "xs" },
-          { maxWidth: "100rem", cols: 3, spacing: "xs" },
-          { maxWidth: "90rem", cols: 2, spacing: "xs" },
-          { maxWidth: "70rem", cols: 1, spacing: "xs" },
-        ]}
+      <InfiniteScroll
+        dataLength={items.length}
+        hasMore={hasMore}
+        next={fetchDataScroll}
+        loader={<h4 className="flex justify-center">Loading More . . .</h4>}
+        endMessage={endMessage}
+        className="pb-2"
       >
-        {filteredPrice.map((item: ProductProps, index) => (
-          <ProductItem key={index} {...item} />
-        ))}
-      </SimpleGrid>
+        <SimpleGrid
+          cols={5}
+          spacing="lg"
+          verticalSpacing="xl"
+          sx={{
+            placeItems: "start",
+            alignItems: "start",
+          }}
+          breakpoints={[
+            { maxWidth: "120rem", cols: 4, spacing: "xs" },
+            { maxWidth: "100rem", cols: 3, spacing: "xs" },
+            { maxWidth: "90rem", cols: 2, spacing: "xs" },
+            { maxWidth: "70rem", cols: 1, spacing: "xs" },
+          ]}
+          className="pb-8"
+        >
+          {items.map((item: ProductProps, index) => (
+            <ProductItem key={index} {...item} />
+          ))}
+        </SimpleGrid>
+      </InfiniteScroll>
     </Box>
   );
 }

@@ -7,32 +7,82 @@ import Sidebar from "@/components/Sidebar/Sidebar";
 import router, { useRouter } from "next/router";
 import { useState } from "react";
 import { Analytics } from '@vercel/analytics/react';
+import { useForm } from "@mantine/form";
+import qs from "qs";
+import React from "react";
 
 export default function App(props: AppProps) {
   const { Component, pageProps } = props;
   const router = useRouter();
   const showSidebar = router.pathname !== "/";
 
-  const [websiteFilter, setWebsiteFilter] = useState("");
-  const [conditionFilter, setConditionFilter] = useState("");
-  const [minPriceFilter, setMinPriceFilter] = useState(0);
-  const [maxPriceFilter, setMaxPriceFilter] = useState(0);
+  interface FilterFormValues {
+    search: string,
+    facebook?: boolean,
+    shopee: boolean,
+    datablitz?: boolean,
+    carousell?: boolean,
+    lazada: boolean,
+    bNew: boolean,
+    lNew: boolean,
+    sUsed: boolean,
+    wUsed: boolean,
+    min: string,
+    max: string,
+  }
 
-  const handleWebsiteFilterChange = (value : string) => {
-    setWebsiteFilter(value);
+  const form = useForm({
+    initialValues: {
+      search: "",
+      facebook: false,
+      shopee: false,
+      datablitz: false,
+      carousell: false,
+      lazada: false,
+      bNew: false,
+      lNew: false,
+      sUsed: false,
+      wUsed: false,
+      min: "",
+      max: "",
+    },
+  });
+
+  const submitForm = (values: any) => {
+    router.push(`?${qs.stringify(form.values)}`);
   };
 
-  const handleConditionFilterChange = (value : string) => {
-    setConditionFilter(value);
-  };
+  
 
-  const handleMinPriceFilterChange = (value : number) => {
-    setMinPriceFilter(value);
-  };
+  React.useEffect(() => {
+    form.reset();
+  }, [router.route]);
 
-  const handleMaxPriceFilterChange = (value: number) => {
-    setMaxPriceFilter(value);
-  };
+  React.useEffect(() => {
+    if (!router.isReady)
+      return;
+    
+    // Load filters on load
+    const queryFilters : any = {};
+    const nonCheckboxes = ["search", "min", "max"];
+    const checkboxes = ["facebook", "shopee", "datablitz", "carousell", "lazada", "bNew", "lNew", "sUsed", "wUsed"];
+    for (const filter of Object.keys(router.query)) {
+      console.log("")
+      // If checkbox, convert string to boolean
+      if ((checkboxes.includes(filter))) {
+        if(router.query[filter] === "true")
+          queryFilters[filter] = true;
+        else
+          queryFilters[filter] = false;
+      }
+      
+      else if (nonCheckboxes.includes(filter))
+        queryFilters[filter] = router.query[filter];
+    }
+    form.setValues(queryFilters);
+    console.log(queryFilters)
+    console.log(`Page load: ${JSON.stringify(router.query)}`)
+  }, [router.query, router.isReady]);
 
   return (
     <>
@@ -54,24 +104,14 @@ export default function App(props: AppProps) {
         }}
       >
         <AppShell
-          header={<WebsiteNavbar />}
+          className="relative"
+          header={<WebsiteNavbar form={form} submitForm={submitForm}/>}
           navbar={
             showSidebar ? 
-              <Sidebar websiteFilter={websiteFilter}
-                       conditionFilter={conditionFilter}
-                       minPriceFilter={minPriceFilter}
-                       maxPriceFilter={maxPriceFilter}
-                       onWebsiteFilterChange={handleWebsiteFilterChange}
-                       onConditionFilterChange={handleConditionFilterChange}
-                       onMinPriceFilterChange={handleMinPriceFilterChange}
-                       onMaxPriceFilterChange={handleMaxPriceFilterChange}/> 
+              <Sidebar form={form} submitForm={submitForm}/> 
               : <></>}
         >
           <Component {...pageProps} 
-            websiteFilter={websiteFilter}
-            conditionFilter={conditionFilter}
-            minPriceFilter={minPriceFilter}
-            maxPriceFilter={maxPriceFilter}
           />
         </AppShell>
       </MantineProvider>

@@ -11,44 +11,18 @@ import {
   Button,
 } from "@mantine/core";
 import "./sidebar.scss";
-import { useForm } from "@mantine/form";
 import { useRouter } from "next/router";
 import qs from "qs";
+import { useForm, UseFormReturnType } from "@mantine/form";
 
-const Sidebar = (props: any) => {
-  const form = useForm({
-    initialValues: {
-      facebook: false,
-      shopee: false,
-      datablitz: false,
-      carousell: false,
-      lazada: false,
-      bNew: false,
-      lNew: false,
-      sUsed: false,
-      wUsed: false,
-      min: "",
-      max: "",
-    },
-  });
+const Sidebar = ({ form, submitForm }: any) => {
+  
   const router = useRouter();
 
-  const submitForm = (values: any) => {
-    router.push(`?${qs.stringify(form.values)}`);
-  };
-
-  React.useEffect(() => {
-    form.reset();
-  }, [router.route]);
-
   return (
-    <Aside fixed={false} position={{ top: 0, left: 0 }} width={{ base: 200 }}>
-      <form onSubmit={form.onSubmit((values) => submitForm(values))}>
+    <Aside fixed={false} position={{ top: 0, left: 0 }} width={{ base: 250 }} className="px-6 py-8 z-0 bg-[#FFF">
+      <form onSubmit={form.onSubmit(() => submitForm())}>
         <Stack
-          sx={{
-            paddingTop: "16px",
-            paddingLeft: "10px",
-          }}
           spacing={0}
         >
           <p className="font-semibold text-2xl">Website</p>

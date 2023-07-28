@@ -5,10 +5,11 @@ interface Website {
 }
 // Keys = query source value | Values = product source value
 export const WEBSITES: Website = {
-//   facebook: "Facebook",
+  facebook: "Facebook", 
   shopee: "Shopee",
-//   carousell: "Carousell",
+  carousell: "Carousell",
   lazada: "Lazada",
+  datablitz: "Datablitz"
 //   tipicpc: "TipicPc",
 //   gilmore: "Gilmore",
 }

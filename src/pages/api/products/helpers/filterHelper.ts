@@ -16,12 +16,16 @@ export function filterProducts(req: NextApiRequest, products: ProductProps[]) {
 
     // Filter by website
     const websiteQueryFilters = Object.keys(WEBSITES).filter(website => query[website] === "true");
+    // console.log(`Query:`);
+    // console.log(query);
+    // console.log(`Website Query Filters: ${websiteQueryFilters}`);
     const websiteFilterList = websiteQueryFilters.map(website => WEBSITES[website]);
     filteredProducts = filterProdsByWebsite(websiteFilterList, filteredProducts);
 
     // Filter by condition
     const conditionQueryFilters = Object.keys(CONDITIONS).filter(condition => query[condition] === "true");
     const conditionFilterList = conditionQueryFilters.map(condition => CONDITIONS[condition]);
+    // TODO: filter by condition
 
     // Filter by price
     const maxPrice = parseInt(query.max as string) || 0;
@@ -47,6 +51,7 @@ function filterProdsBySearch(searchStr: string | null, products: ProductProps[])
  * @returns filtered products
  */
 function filterProdsByWebsite(websites: string[], products: ProductProps[]) {
+    // console.log(`Websites to search: ${websites}`);
     if (websites.length > 0) {
       products = products.filter((product: any) => websites.includes(product.source));
     }
