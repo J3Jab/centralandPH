@@ -7,7 +7,7 @@ import ProductItem, {
   ProductProps,
 } from "@/components/ProductItem/ProductItem";
 import { useRouter } from "next/router";
-import { Analytics } from '@vercel/analytics/react';
+
 export default function Games() {
   const [items, setItems] = useState([]);
   const [isLoading, setLoading] = useState(true);
@@ -250,7 +250,5 @@ export default function Games() {
         ))}
       </SimpleGrid>
     </Box>
-     
   );
-  <Analytics />
 }
