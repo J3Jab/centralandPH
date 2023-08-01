@@ -2,6 +2,7 @@ import Image from 'next/image';
 import ProductTag from '../ProductTag/ProductTag';
 import './ProductItem.scss';
 import Link from 'next/link';
+import va from '@vercel/analytics';
 
 // Component for product items
 export interface ProductProps {
@@ -19,6 +20,7 @@ export default function ProductItem(props: ProductProps) {
 	const link = props.product_link.includes('https://')
 		? props.product_link
 		: 'https://'.concat(props.product_link);
+	va.track('Product');
 	return (
 		<Link href={link} target='_blank'>
 			<div className='product-item--container flex flex-col items-start pb-4 w-[260px] h-[395px] cursor-pointer relative'>
