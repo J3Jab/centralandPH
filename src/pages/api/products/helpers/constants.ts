@@ -1,4 +1,4 @@
-export const PRODUCT_DATA_LENGTH = 5;
+export const PRODUCT_DATA_LENGTH = 20;
 
 interface Website {
   [key: string]: string
