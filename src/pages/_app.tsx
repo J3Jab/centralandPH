@@ -16,6 +16,19 @@ export default function App(props: AppProps) {
   const router = useRouter();
   const showSidebar = router.pathname !== "/";
 
+  const [smallAd, setSmallAd] = useState("");
+  const [bigAd, setBigAd] = useState("");
+
+  React.useEffect(() => {
+    async function generateSmallAd () {
+      const result = await fetch("api/ads/generate_small_ad");
+      const data = await result.json();
+      setSmallAd(data);
+    }
+
+    generateSmallAd();
+  }, [])  
+
   interface FilterFormValues {
     search: string,
     facebook?: boolean,
@@ -51,8 +64,6 @@ export default function App(props: AppProps) {
   const submitForm = (values: any) => {
     router.push(`?${qs.stringify(form.values)}`);
   };
-
-  
 
   React.useEffect(() => {
     form.reset();
@@ -108,7 +119,7 @@ export default function App(props: AppProps) {
           header={<WebsiteNavbar form={form} submitForm={submitForm}/>}
           navbar={
             showSidebar ? 
-              <Sidebar form={form} submitForm={submitForm}/> 
+              <Sidebar form={form} submitForm={submitForm} smallAd={smallAd}/> 
               : <></>}
         >
           <Component {...pageProps} 

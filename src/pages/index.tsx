@@ -8,6 +8,7 @@ import { useState, useEffect, useRef } from 'react';
 import SearchIcon from '../components/Icons/SearchIcon';
 import HomeChip from '../components/Chips/HomeChip';
 import Link from 'next/link';
+import BigAd from '../components/Ads/BigAd';
 
 export default function IndexPage() {
 	const [isLoading, setLoading] = useState(false);
@@ -26,6 +27,7 @@ export default function IndexPage() {
 		{ label: 'PC Parts', isActive: false },
 		{ label: 'Peripherals', isActive: false },
 	]);
+	const [bigAd, setBigAd] = useState("");
 
 	const getFilter = (chipObject: any) => {
 		let filter = '';
@@ -111,6 +113,12 @@ export default function IndexPage() {
 				setNewItems(data);
 				setLoading(false);
 			});
+		async function generateBigAd() {
+			const result = await fetch("api/ads/generate_big_ad");
+			const data = await result.json();
+			setBigAd(data);
+		}
+		generateBigAd();
 	}, []);
 
 	useEffect(() => {
@@ -210,6 +218,12 @@ export default function IndexPage() {
 					</SimpleGrid>
 				</div>
 			</section>
+
+			{/* Big Ad */}
+			<div className="flex justify-center my-8">
+				<BigAd imageSrc={bigAd} />
+			</div>
+			
 
 			{/* Newly Listed */}
 			<section className=''>

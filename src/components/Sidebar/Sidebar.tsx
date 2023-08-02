@@ -11,16 +11,19 @@ import {
   Button,
 } from "@mantine/core";
 import "./sidebar.scss";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import qs from "qs";
 import { useForm, UseFormReturnType } from "@mantine/form";
+import SmallAd, { SmallAdProps } from "../Ads/SmallAd";
 
-const Sidebar = ({ form, submitForm }: any) => {
+const Sidebar = ({ form, submitForm, smallAd }: any) => {
   
   const router = useRouter();
+  
 
   return (
-    <Aside fixed={false} position={{ top: 0, left: 0 }} width={{ base: 250 }} className="px-6 py-8 z-0 bg-[#FFF">
+    <Aside fixed={false} position={{ top: 0, left: 0 }} width={{ base: 250 }} className="px-6 py-8 z-0 bg-[#FFF] overflow-auto">
       <form onSubmit={form.onSubmit(() => submitForm())}>
         <Stack
           spacing={0}
@@ -100,6 +103,11 @@ const Sidebar = ({ form, submitForm }: any) => {
           </Group>
         </Stack>
       </form>
+
+      <div className="mt-8">
+        <SmallAd imageSrc={smallAd}/>
+      </div>
+      
     </Aside>
   );
 };
