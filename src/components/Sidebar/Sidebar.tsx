@@ -16,6 +16,7 @@ import { useRouter } from "next/router";
 import qs from "qs";
 import { useForm, UseFormReturnType } from "@mantine/form";
 import SmallAd, { SmallAdProps } from "../Ads/SmallAd";
+import va from '@vercel/analytics';
 
 const Sidebar = ({ form, submitForm, smallAd }: any) => {
   
@@ -104,7 +105,10 @@ const Sidebar = ({ form, submitForm, smallAd }: any) => {
         </Stack>
       </form>
 
-      <div className="mt-8">
+      <div className="mt-8"
+      onClick={() => {
+        va.track('Small Ad');
+      }}>
         <SmallAd imageSrc={smallAd}/>
       </div>
       

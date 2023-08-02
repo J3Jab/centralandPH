@@ -223,7 +223,7 @@ export default function IndexPage() {
 			{/* Big Ad */}
 			<div className="flex justify-center my-8" 
 			onClick={() => {
-        	va.track('Signup');
+        	va.track('Big Ad');
       		}}>
 				<BigAd imageSrc={bigAd} />
 			</div>
