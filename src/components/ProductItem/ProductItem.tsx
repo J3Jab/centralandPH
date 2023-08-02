@@ -20,9 +20,10 @@ export default function ProductItem(props: ProductProps) {
 	const link = props.product_link.includes('https://')
 		? props.product_link
 		: 'https://'.concat(props.product_link);
-	va.track('Product');
 	return (
-		<Link href={link} target='_blank'>
+		<Link href={link} target='_blank' onClick={() => {
+			va.track('Product Clicks');
+		}}>
 			<div className='product-item--container flex flex-col items-start pb-4 w-[260px] h-[395px] cursor-pointer relative'>
 				<div className='item-overlay absolute bg-white-400 z-10 transition w-full h-full opacity-0'></div>
 				<div className='aspect-square w-full relative'>

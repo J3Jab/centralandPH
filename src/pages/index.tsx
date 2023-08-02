@@ -9,6 +9,7 @@ import SearchIcon from '../components/Icons/SearchIcon';
 import HomeChip from '../components/Chips/HomeChip';
 import Link from 'next/link';
 import BigAd from '../components/Ads/BigAd';
+import va from '@vercel/analytics';
 
 export default function IndexPage() {
 	const [isLoading, setLoading] = useState(false);
@@ -220,7 +221,10 @@ export default function IndexPage() {
 			</section>
 
 			{/* Big Ad */}
-			<div className="flex justify-center my-8">
+			<div className="flex justify-center my-8" 
+			onClick={() => {
+        	va.track('Signup');
+      		}}>
 				<BigAd imageSrc={bigAd} />
 			</div>
 			
