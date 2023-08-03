@@ -32,11 +32,6 @@ const Sidebar = ({ form, submitForm, smallAd }: any) => {
           <p className="font-semibold text-2xl">Website</p>
           <Checkbox
             mt="md"
-            label="Facebook"
-            {...form.getInputProps("facebook", { type: "checkbox" })}
-          />
-          <Checkbox
-            mt="md"
             label="Shopee"
             {...form.getInputProps("shopee", { type: "checkbox" })}
           />
@@ -49,11 +44,6 @@ const Sidebar = ({ form, submitForm, smallAd }: any) => {
             mt="md"
             label="Carousell"
             {...form.getInputProps("carousell", { type: "checkbox" })}
-          />
-          <Checkbox
-            mt="md"
-            label="Lazada"
-            {...form.getInputProps("lazada", { type: "checkbox" })}
           />
 
           <Space h="md" />
