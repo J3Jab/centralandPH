@@ -37,13 +37,13 @@ const Sidebar = ({ form, submitForm, smallAd }: any) => {
           />
           <Checkbox
             mt="md"
-            label="Datablitz"
-            {...form.getInputProps("datablitz", { type: "checkbox" })}
+            label="Carousell"
+            {...form.getInputProps("carousell", { type: "checkbox" })}
           />
           <Checkbox
             mt="md"
-            label="Carousell"
-            {...form.getInputProps("carousell", { type: "checkbox" })}
+            label="Lazada"
+            {...form.getInputProps("lazada", { type: "checkbox" })}
           />
 
           <Space h="md" />
